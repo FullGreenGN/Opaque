@@ -1,6 +1,17 @@
 {
 	"name": "opaque",
+	"version": "0.1.0",
 	"private": true,
+	"license": "MIT",
+	"author": "FullGreenGN",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/FullGreenGN/opaque.git"
+	},
+	"bugs": {
+		"url": "https://github.com/FullGreenGN/opaque/issues"
+	},
+	"homepage": "https://github.com/FullGreenGN/opaque#readme",
 	"workspaces": [
 		"apps/*",
 		"packages/*"
