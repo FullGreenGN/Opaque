@@ -152,4 +152,32 @@ export const authRouter = router({
 
 			return myKeystoreSchema.parse(user?.keystore ?? null);
 		}),
+
+	// Creates the caller's keystore. Deliberately create-only: this is not a
+	// key-rotation endpoint, so a keystore that already exists is left alone
+	// rather than silently overwritten (which could brick the account's
+	// existing messages or let a hijacked session replace legitimate key
+	// material with the attacker's own).
+	provisionKeystore: protectedProcedure
+		.input(keystoreSchema)
+		.mutation(async ({ ctx, input }) => {
+			const existing = await prisma.encryptedKeystore.findUnique({
+				where: { userId: ctx.session.user.id },
+				select: { id: true },
+			});
+
+			if (existing) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "A keystore already exists for this account",
+				});
+			}
+
+			await prisma.encryptedKeystore.create({
+				data: {
+					userId: ctx.session.user.id,
+					...input,
+				},
+			});
+		}),
 });

@@ -12,6 +12,7 @@ import { Skeleton } from "@opaque/ui/components/skeleton";
 import { Link, useNavigate } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth-client";
+import { clearIdentityPrivateKey } from "@/lib/session-keys";
 
 export default function UserMenu() {
 	const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function UserMenu() {
 							authClient.signOut({
 								fetchOptions: {
 									onSuccess: () => {
+										clearIdentityPrivateKey();
 										navigate({
 											to: "/",
 										});

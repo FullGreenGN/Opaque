@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { setIdentityPrivateKey } from "@/lib/session-keys";
+import { deriveMasterKey, unwrapPrivateKey, wipe } from "@/lib/zero-knowledge";
 import { trpcClient } from "@/utils/trpc";
 
 import Loader from "./loader";
@@ -34,13 +36,44 @@ export default function SignInForm({
 			// deterministic decoy) whether or not the account/keystore exists,
 			// so any thrown error here is a genuine service failure, not a
 			// "no account" signal — don't branch on error shape.
+			let keystore: Awaited<
+				ReturnType<typeof trpcClient.auth.getKeystore.query>
+			>;
 			try {
-				await trpcClient.auth.getKeystore.query({ email: value.email });
-				// TODO: deriveMasterKey(value.password, keystore.keyDerivationSalt, keystore.keyDerivationParams)
-				// TODO: unwrapPrivateKey(keystore, masterKey) and hold the identity key in memory only.
+				keystore = await trpcClient.auth.getKeystore.query({
+					email: value.email,
+				});
 			} catch {
 				toast.error("Could not reach the keystore service");
 				return;
+			}
+
+			// Deriving the master key and unwrapping the private key is
+			// best-effort and must never block sign-in: a decoy keystore, a
+			// wrong password against a real one, or any local crypto hiccup
+			// will fail here, and that's expected — Better Auth below is the
+			// actual authentication gate, not this. We just won't have a local
+			// identity key for the session in that case.
+			try {
+				const masterKey = await deriveMasterKey(
+					value.password,
+					keystore.keyDerivationSalt,
+					keystore.keyDerivationParams,
+				);
+				try {
+					const privateKey = await unwrapPrivateKey(
+						{
+							encryptedPrivateKey: keystore.encryptedPrivateKey,
+							encryptionNonce: keystore.encryptionNonce,
+						},
+						masterKey,
+					);
+					setIdentityPrivateKey(privateKey);
+				} finally {
+					await wipe(masterKey);
+				}
+			} catch {
+				// No usable identity key for this session — fine, see above.
 			}
 
 			await authClient.signIn.email(

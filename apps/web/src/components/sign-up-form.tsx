@@ -8,6 +8,7 @@ import z from "zod";
 
 import { useKeystoreBootstrap } from "@/hooks/use-keystore-bootstrap";
 import { authClient } from "@/lib/auth-client";
+import { trpcClient } from "@/utils/trpc";
 
 import Loader from "./loader";
 
@@ -31,9 +32,18 @@ export default function SignUpForm({
 		onSubmit: async ({ value }) => {
 			// Walks the client-side key-provisioning pipeline (key generation,
 			// Argon2id derivation, XChaCha20-Poly1305 wrapping) before the account
-			// is created. The pipeline is currently a scaffold — see
-			// @/lib/zero-knowledge — so nothing here reaches the server yet.
-			await keystoreBootstrap.run();
+			// is created. If this fails, we don't create the account — there's no
+			// way to add a keystore after the fact yet, so a half-provisioned
+			// account would be stuck in the empty state forever.
+			let keystorePayload: Awaited<ReturnType<typeof keystoreBootstrap.run>>;
+			try {
+				keystorePayload = await keystoreBootstrap.run(value.password);
+			} catch {
+				toast.error(
+					"Could not prepare your encryption keys. Please try again.",
+				);
+				return;
+			}
 
 			await authClient.signUp.email(
 				{
@@ -42,7 +52,14 @@ export default function SignUpForm({
 					name: value.name,
 				},
 				{
-					onSuccess: () => {
+					onSuccess: async () => {
+						try {
+							await trpcClient.auth.provisionKeystore.mutate(keystorePayload);
+						} catch {
+							toast.error(
+								"Account created, but your encryption keys couldn't be saved. Contact support.",
+							);
+						}
 						navigate({
 							to: "/dashboard",
 						});

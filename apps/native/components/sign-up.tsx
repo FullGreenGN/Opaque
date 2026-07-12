@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
 	ActivityIndicator,
+	Alert,
 	Text,
 	TextInput,
 	TouchableOpacity,
@@ -13,7 +14,7 @@ import z from "zod";
 
 import { useKeystoreBootstrap } from "@/hooks/use-keystore-bootstrap";
 import { authClient } from "@/lib/auth-client";
-import { queryClient } from "@/utils/trpc";
+import { queryClient, trpcClient } from "@/utils/trpc";
 
 const signUpSchema = z.object({
 	name: z
@@ -76,9 +77,16 @@ export function SignUp() {
 		onSubmit: async ({ value, formApi }) => {
 			// Walks the client-side key-provisioning pipeline (key generation,
 			// Argon2id derivation, XChaCha20-Poly1305 wrapping) before the account
-			// is created. The pipeline is currently a scaffold — see
-			// @/lib/zero-knowledge — so nothing here reaches the server yet.
-			await keystoreBootstrap.run();
+			// is created. If this fails, we don't create the account — there's no
+			// way to add a keystore after the fact yet, so a half-provisioned
+			// account would be stuck in the empty state forever.
+			let keystorePayload: Awaited<ReturnType<typeof keystoreBootstrap.run>>;
+			try {
+				keystorePayload = await keystoreBootstrap.run(value.password);
+			} catch {
+				setError("Could not prepare your encryption keys. Please try again.");
+				return;
+			}
 
 			await authClient.signUp.email(
 				{
@@ -90,8 +98,16 @@ export function SignUp() {
 					onError(error) {
 						setError(error.error?.message || "Failed to sign up");
 					},
-					onSuccess() {
+					onSuccess: async () => {
 						setError(null);
+						try {
+							await trpcClient.auth.provisionKeystore.mutate(keystorePayload);
+						} catch {
+							Alert.alert(
+								"Encryption keys not saved",
+								"Your account was created, but we couldn't save your encryption keys. Contact support.",
+							);
+						}
 						formApi.reset();
 						queryClient.refetchQueries();
 						router.replace("/dashboard");

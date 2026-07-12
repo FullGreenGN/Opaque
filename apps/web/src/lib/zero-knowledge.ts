@@ -4,14 +4,21 @@
  * The server (packages/api, packages/db) never sees a raw password, a raw
  * private key, or plaintext message content. Everything in this module runs
  * in the browser; only the outputs marked "safe to transmit" are ever sent
- * to `auth.getKeystore` / a future keystore-provisioning mutation.
+ * to `auth.getKeystore`/`auth.provisionKeystore`.
  *
- * Every function below is a scaffold: it defines the shape of the pipeline
- * and reports progress through `KeystoreBootstrapState`, but the actual
- * primitives (Argon2id, X25519, XChaCha20-Poly1305) are not wired in yet.
- * They should be implemented with a WASM/native crypto library (e.g.
- * libsodium-wrappers) — never a hand-rolled cipher.
+ * Phase 1 (this file, as of now): identity keypair generation, Argon2id
+ * master-key derivation, and XChaCha20-Poly1305 key wrapping/unwrapping are
+ * real, via libsodium (a vetted native/WASM implementation — never hand-roll
+ * these primitives).
+ *
+ * Phase 2 (not yet): message encryption/decryption (`encryptMessage`,
+ * `decryptMessage` below) are still stubs — they intentionally throw rather
+ * than silently no-op or fake it.
  */
+
+// The base libsodium-wrappers build doesn't include crypto_pwhash
+// (Argon2id) — that's a "sumo" (extended) build feature.
+import sodium from "libsodium-wrappers-sumo";
 
 export type KeystoreBootstrapState =
 	| "idle"
@@ -46,42 +53,106 @@ export interface WrappedPrivateKey {
 	encryptionNonce: string;
 }
 
-/** TODO: generate an X25519 identity keypair client-side (e.g. libsodium `crypto_box_keypair`). */
+let readyPromise: Promise<typeof sodium> | null = null;
+
+/** libsodium's WASM module needs to finish loading before any call below is safe to make. */
+function getSodium(): Promise<typeof sodium> {
+	if (!readyPromise) {
+		readyPromise = sodium.ready.then(() => sodium);
+	}
+	return readyPromise;
+}
+
+const BASE64 = () => sodium.base64_variants.ORIGINAL;
+
+/** A fresh random salt for Argon2id, base64-encoded for storage/transmission. */
+export async function generateSalt(): Promise<string> {
+	const s = await getSodium();
+	return s.to_base64(s.randombytes_buf(s.crypto_pwhash_SALTBYTES), BASE64());
+}
+
+/** Generates an X25519 identity keypair client-side. Never leaves the device unwrapped. */
 export async function generateIdentityKeyPair(): Promise<IdentityKeyPair> {
-	throw new Error(
-		"generateIdentityKeyPair is not implemented — client-side crypto pending",
-	);
+	const s = await getSodium();
+	const { publicKey, privateKey } = s.crypto_box_keypair();
+	return {
+		publicKey: s.to_base64(publicKey, BASE64()),
+		privateKey: s.to_base64(privateKey, BASE64()),
+	};
 }
 
-/** TODO: derive a master key from the account password via Argon2id, using a fresh random salt. */
+/** Derives a 32-byte master key from the account password via Argon2id. */
 export async function deriveMasterKey(
-	_password: string,
-	_salt: string,
-	_params: Argon2idParams = DEFAULT_ARGON2ID_PARAMS,
+	password: string,
+	salt: string,
+	params: Argon2idParams = DEFAULT_ARGON2ID_PARAMS,
 ): Promise<Uint8Array> {
-	throw new Error(
-		"deriveMasterKey is not implemented — Argon2id derivation pending",
+	const s = await getSodium();
+	return s.crypto_pwhash(
+		s.crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+		password,
+		s.from_base64(salt, BASE64()),
+		params.iterations,
+		params.memoryCostKib * 1024,
+		s.crypto_pwhash_ALG_ARGON2ID13,
 	);
 }
 
-/** TODO: seal the identity private key with XChaCha20-Poly1305 using the Argon2id master key. */
+/** Seals the identity private key with XChaCha20-Poly1305 using the Argon2id master key. */
 export async function wrapPrivateKey(
-	_privateKey: string,
-	_masterKey: Uint8Array,
+	privateKey: string,
+	masterKey: Uint8Array,
 ): Promise<WrappedPrivateKey> {
-	throw new Error(
-		"wrapPrivateKey is not implemented — XChaCha20-Poly1305 sealing pending",
+	const s = await getSodium();
+	const nonce = s.randombytes_buf(
+		s.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
 	);
+	const ciphertext = s.crypto_aead_xchacha20poly1305_ietf_encrypt(
+		privateKey,
+		null,
+		null,
+		nonce,
+		masterKey,
+	);
+	return {
+		encryptedPrivateKey: s.to_base64(ciphertext, BASE64()),
+		encryptionNonce: s.to_base64(nonce, BASE64()),
+	};
 }
 
-/** TODO: open a wrapped private key with the Argon2id master key. */
+/** Opens a wrapped private key with the Argon2id master key. Throws if the key/password is wrong. */
 export async function unwrapPrivateKey(
-	_wrapped: WrappedPrivateKey,
-	_masterKey: Uint8Array,
+	wrapped: WrappedPrivateKey,
+	masterKey: Uint8Array,
 ): Promise<string> {
-	throw new Error(
-		"unwrapPrivateKey is not implemented — XChaCha20-Poly1305 unsealing pending",
+	const s = await getSodium();
+	const plaintext = s.crypto_aead_xchacha20poly1305_ietf_decrypt(
+		null,
+		s.from_base64(wrapped.encryptedPrivateKey, BASE64()),
+		null,
+		s.from_base64(wrapped.encryptionNonce, BASE64()),
+		masterKey,
 	);
+	return s.to_base64(plaintext, BASE64());
+}
+
+/**
+ * Derives the X25519 public key from a private key, for verifying an
+ * unwrapped private key actually matches the account's known public key
+ * (e.g. after a successful unwrap during sign-in).
+ */
+export async function publicKeyFromPrivateKey(
+	privateKey: string,
+): Promise<string> {
+	const s = await getSodium();
+	const derived = s.crypto_scalarmult_base(s.from_base64(privateKey, BASE64()));
+	return s.to_base64(derived, BASE64());
+}
+
+/** Best-effort zeroing of key material once it's no longer needed. Not a guarantee in JS. */
+export async function wipe(bytes: Uint8Array): Promise<void> {
+	const s = await getSodium();
+	s.memzero(bytes);
 }
 
 /** TODO: seal outgoing message plaintext with the conversation's session key. */
