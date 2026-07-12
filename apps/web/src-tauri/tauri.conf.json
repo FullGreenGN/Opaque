@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "no-chat",
+  "productName": "Opaque",
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
   "build": {
@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "no-chat",
-        "width": 800,
-        "height": 600,
+        "title": "Opaque",
+        "width": 1280,
+        "height": 720,
         "resizable": true,
         "fullscreen": false
       }
