@@ -1,0 +1,81 @@
+name: Bug Report
+description: Report something that's broken
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Found a security issue (auth, session handling, IDOR, key/keystore exposure, etc.)? Please use [private vulnerability reporting](https://github.com/FullGreenGN/Opaque/security/advisories/new) instead of a public issue — see [SECURITY.md](../../SECURITY.md).
+
+        Also check the README's [Security status](../../README.md#security-status--what-is-and-isnt-real-yet) section first — client-side encryption is a known, tracked placeholder, not a bug. Reports like "messages aren't actually encrypted" will be closed as duplicate/known.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear, concise description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we see this ourselves?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does this happen?
+      multiple: true
+      options:
+        - Web (apps/web)
+        - Desktop / Tauri
+        - Mobile (apps/native)
+        - API / Server (packages/api, apps/server)
+        - Database / Prisma (packages/db)
+        - Auth (packages/auth)
+        - Shared UI (packages/ui)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: e.g. 0.1.0, or a commit SHA
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context / logs
+      description: Screenshots, stack traces, console output — anything that helps.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I checked this isn't one of the known placeholders in the README's Security status section
+          required: true
+        - label: I searched existing issues and this hasn't already been reported
+          required: true
