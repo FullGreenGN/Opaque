@@ -10,6 +10,12 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  // esbuild's dependency pre-bundling breaks libsodium-wrappers' internal
+  // WASM (blob URL) loading, causing sodium.ready to hang forever. Serving
+  // it unbundled avoids that.
+  optimizeDeps: {
+    exclude: ["libsodium-wrappers-sumo"],
+  },
   plugins: [
     tailwindcss(),
     tanstackRouter({

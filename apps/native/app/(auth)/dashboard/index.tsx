@@ -7,6 +7,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { ConversationListItem } from "@/components/chat/conversation-list-item";
 import { Container } from "@/components/container";
 import { authClient } from "@/lib/auth-client";
+import { clearIdentityPrivateKey } from "@/lib/session-keys";
 import { trpc } from "@/utils/trpc";
 
 export default function DashboardScreen() {
@@ -25,7 +26,10 @@ export default function DashboardScreen() {
 							onPress={() => {
 								authClient.signOut({
 									fetchOptions: {
-										onSuccess: () => router.replace("/login"),
+										onSuccess: () => {
+											clearIdentityPrivateKey();
+											router.replace("/login");
+										},
 									},
 								});
 							}}
