@@ -1,0 +1,25 @@
+{
+  "name": "@no-chat/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@better-auth/expo": "catalog:",
+    "@no-chat/db": "workspace:*",
+    "@no-chat/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@no-chat/config": "workspace:*",
+    "typescript": "^6"
+  }
+}

@@ -1,0 +1,3 @@
+{
+  "extends": "@no-chat/config/tsconfig.base.json"
+}

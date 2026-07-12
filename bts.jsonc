@@ -1,0 +1,31 @@
+// Better-T-Stack
+//
+// Website: https://www.better-t-stack.dev/
+// Stack Builder: https://www.better-t-stack.dev/new
+// Analytics: https://www.better-t-stack.dev/analytics
+// Showcase: https://www.better-t-stack.dev/showcase
+// Sponsor: https://github.com/sponsors/AmanVarshney01
+//
+// Add new addons with: pnpm dlx create-better-t-stack add
+// This file is safe to delete
+
+{
+  "$schema": "https://r2.better-t-stack.dev/schema.json",
+  "version": "3.36.3",
+  "createdAt": "2026-07-12T15:02:12.393Z",
+  "reproducibleCommand": "pnpm create better-t-stack@latest no-chat --frontend tanstack-router native-unistyles --backend fastify --runtime node --database postgres --orm prisma --api trpc --auth better-auth --payments none --addons biome fumadocs skills tauri turborepo --examples none --db-setup docker --web-deploy docker --server-deploy docker --git --package-manager pnpm --install",
+  "database": "postgres",
+  "orm": "prisma",
+  "backend": "fastify",
+  "runtime": "node",
+  "frontend": ["tanstack-router", "native-unistyles"],
+  "addons": ["biome", "fumadocs", "skills", "tauri", "turborepo"],
+  "examples": [],
+  "auth": "better-auth",
+  "payments": "none",
+  "packageManager": "pnpm",
+  "dbSetup": "docker",
+  "api": "trpc",
+  "webDeploy": "docker",
+  "serverDeploy": "docker",
+}

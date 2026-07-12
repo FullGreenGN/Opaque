@@ -1,0 +1,24 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  esbuild: true
+  sharp: true
+  "@prisma/engines": true
+  prisma: true
+catalog:
+  dotenv: ^17.4.2
+  zod: ^4.4.3
+  "@types/node": ^22.13.14
+  "@trpc/server": ^11.18.0
+  better-auth: 1.6.23
+  lucide-react: ^1.23.0
+  next-themes: ^0.4.6
+  sonner: ^2.0.7
+  "@trpc/tanstack-react-query": ^11.18.0
+  "@trpc/client": ^11.18.0
+  "@tanstack/react-query": ^5.101.2
+  "@tanstack/react-form": ^1.33.0
+  "@types/react-dom": ^19.2.3
+  tailwindcss: ^4.3.2
+  "@better-auth/expo": 1.6.23
