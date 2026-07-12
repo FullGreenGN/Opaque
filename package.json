@@ -1,43 +1,43 @@
 {
-  "name": "no-chat",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "type": "module",
-  "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "check-types": "turbo run check-types",
-    "dev:native": "turbo run dev -F native",
-    "dev:web": "turbo run dev -F web",
-    "dev:server": "turbo run dev -F server",
-    "db:push": "turbo run db:push -F @no-chat/db",
-    "db:studio": "turbo run db:studio -F @no-chat/db",
-    "db:generate": "turbo run db:generate -F @no-chat/db",
-    "db:migrate": "turbo run db:migrate -F @no-chat/db",
-    "db:start": "docker compose up -d postgres",
-    "db:watch": "docker compose up postgres",
-    "db:stop": "docker compose stop postgres",
-    "db:down": "docker compose down postgres",
-    "docker:build": "docker compose build",
-    "docker:up": "docker compose up -d --build",
-    "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f",
-    "check": "biome check --write ."
-  },
-  "dependencies": {
-    "@no-chat/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.5.2",
-    "@no-chat/config": "workspace:*",
-    "@types/node": "catalog:",
-    "turbo": "^2.10.2",
-    "typescript": "^6"
-  },
-  "packageManager": "pnpm@10.33.2"
+	"name": "opaque",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"type": "module",
+	"scripts": {
+		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"check-types": "turbo run check-types",
+		"dev:native": "turbo run dev -F native",
+		"dev:web": "turbo run dev -F web",
+		"dev:server": "turbo run dev -F server",
+		"db:push": "turbo run db:push -F @opaque/db",
+		"db:studio": "turbo run db:studio -F @opaque/db",
+		"db:generate": "turbo run db:generate -F @opaque/db",
+		"db:migrate": "turbo run db:migrate -F @opaque/db",
+		"db:start": "docker compose up -d postgres",
+		"db:watch": "docker compose up postgres",
+		"db:stop": "docker compose stop postgres",
+		"db:down": "docker compose down postgres",
+		"docker:build": "docker compose build",
+		"docker:up": "docker compose up -d --build",
+		"docker:down": "docker compose down",
+		"docker:logs": "docker compose logs -f",
+		"check": "biome check --write ."
+	},
+	"dependencies": {
+		"@opaque/env": "workspace:*",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.2",
+		"@opaque/config": "workspace:*",
+		"@types/node": "catalog:",
+		"turbo": "^2.10.2",
+		"typescript": "^6"
+	},
+	"packageManager": "pnpm@10.33.2"
 }

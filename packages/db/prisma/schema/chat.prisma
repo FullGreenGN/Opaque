@@ -1,0 +1,79 @@
+enum ConversationType {
+  DIRECT
+  GROUP
+}
+
+/// A conversation is a metadata-minimized container. It never stores plaintext
+/// message content; only the ciphertext blobs on Message do. Group names are
+/// encrypted client-side before being written to `encryptedName`.
+model Conversation {
+  id            String           @id @default(cuid())
+  type          ConversationType @default(DIRECT)
+  encryptedName String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@map("conversation")
+}
+
+/// Join table between User and Conversation. `encryptedSessionKey` is the
+/// conversation's symmetric key, wrapped client-side to this participant's
+/// public key (from EncryptedKeystore) — the server only ever handles ciphertext.
+model ConversationParticipant {
+  id             String    @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime  @default(now())
+  lastReadAt     DateTime?
+
+  encryptedSessionKey String
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+  @@map("conversation_participant")
+}
+
+/// `ciphertext` is the XChaCha20-Poly1305 sealed payload produced client-side;
+/// the server stores and relays it without ever seeing plaintext.
+model Message {
+  id              String   @id @default(cuid())
+  conversationId  String
+  senderId        String
+  ciphertext      String
+  nonce           String
+  senderPublicKey String?
+  createdAt       DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("message")
+}
+
+/// Holds only the client-derived public key and a client-wrapped private key.
+/// `encryptedPrivateKey` is sealed with a key derived from the user's password
+/// via Argon2id and never leaves the client in plaintext; the server cannot
+/// decrypt it. `keyDerivationParams` lets the client reproduce the exact Argon2id
+/// cost parameters (memory/iterations/parallelism) used at creation time.
+model EncryptedKeystore {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  publicKey           String
+  encryptedPrivateKey String
+  keyDerivationSalt   String
+  keyDerivationParams Json
+  encryptionNonce     String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("encrypted_keystore")
+}

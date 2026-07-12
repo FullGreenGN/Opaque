@@ -9,6 +9,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  keystore     EncryptedKeystore?
+  participants ConversationParticipant[]
+  messages     Message[]
+
   @@unique([email])
   @@map("user")
 }

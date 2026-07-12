@@ -1,27 +1,27 @@
 {
-  "name": "@no-chat/api",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {},
-  "dependencies": {
-    "@no-chat/auth": "workspace:*",
-    "@no-chat/db": "workspace:*",
-    "@no-chat/env": "workspace:*",
-    "@trpc/client": "catalog:",
-    "@trpc/server": "catalog:",
-    "better-auth": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@no-chat/config": "workspace:*",
-    "typescript": "^6"
-  }
+	"name": "@opaque/api",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@opaque/auth": "workspace:*",
+		"@opaque/db": "workspace:*",
+		"@opaque/env": "workspace:*",
+		"@trpc/client": "catalog:",
+		"@trpc/server": "catalog:",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@opaque/config": "workspace:*",
+		"typescript": "^6"
+	}
 }

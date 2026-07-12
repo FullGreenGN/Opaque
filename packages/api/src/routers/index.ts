@@ -1,14 +1,18 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
+import { authRouter } from "./auth";
+import { chatRouter } from "./chat";
 
 export const appRouter = router({
-  healthCheck: publicProcedure.query(() => {
-    return "OK";
-  }),
-  privateData: protectedProcedure.query(({ ctx }) => {
-    return {
-      message: "This is private",
-      user: ctx.session.user,
-    };
-  }),
+	healthCheck: publicProcedure.query(() => {
+		return "OK";
+	}),
+	privateData: protectedProcedure.query(({ ctx }) => {
+		return {
+			message: "This is private",
+			user: ctx.session.user,
+		};
+	}),
+	auth: authRouter,
+	chat: chatRouter,
 });
 export type AppRouter = typeof appRouter;

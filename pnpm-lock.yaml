@@ -56,7 +56,7 @@ importers:
 
   .:
     dependencies:
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:packages/env
       dotenv:
@@ -69,7 +69,7 @@ importers:
       '@biomejs/biome':
         specifier: ^2.5.2
         version: 2.5.3
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:packages/config
       '@types/node':
@@ -169,10 +169,10 @@ importers:
       '@expo/vector-icons':
         specifier: ^15.1.1
         version: 15.1.1(expo-font@57.0.0)(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
-      '@no-chat/api':
+      '@opaque/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../../packages/env
       '@tanstack/react-form':
@@ -278,7 +278,7 @@ importers:
       '@babel/core':
         specifier: ^7.29.7
         version: 7.29.7
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@types/react':
@@ -299,16 +299,16 @@ importers:
       '@hono/trpc-server':
         specifier: ^0.4.2
         version: 0.4.2(@trpc/server@11.18.0(typescript@6.0.3))(hono@4.12.29)
-      '@no-chat/api':
+      '@opaque/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@no-chat/auth':
+      '@opaque/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@no-chat/db':
+      '@opaque/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../../packages/env
       '@trpc/server':
@@ -327,7 +327,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@types/node':
@@ -348,13 +348,13 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.4.0
         version: 5.4.0(react-hook-form@7.81.0(react@19.2.7))
-      '@no-chat/api':
+      '@opaque/api':
         specifier: workspace:*
         version: link:../../packages/api
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../../packages/env
-      '@no-chat/ui':
+      '@opaque/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tailwindcss/vite':
@@ -403,7 +403,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@tanstack/react-query-devtools':
@@ -445,13 +445,13 @@ importers:
 
   packages/api:
     dependencies:
-      '@no-chat/auth':
+      '@opaque/auth':
         specifier: workspace:*
         version: link:../auth
-      '@no-chat/db':
+      '@opaque/db':
         specifier: workspace:*
         version: link:../db
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../env
       '@trpc/client':
@@ -470,7 +470,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../config
       typescript:
@@ -482,10 +482,10 @@ importers:
       '@better-auth/expo':
         specifier: 'catalog:'
         version: 1.6.23(42e46286372ca6a4dd4a10c68949f87e)
-      '@no-chat/db':
+      '@opaque/db':
         specifier: workspace:*
         version: link:../db
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../env
       better-auth:
@@ -498,7 +498,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../config
       typescript:
@@ -509,7 +509,7 @@ importers:
 
   packages/db:
     dependencies:
-      '@no-chat/env':
+      '@opaque/env':
         specifier: workspace:*
         version: link:../env
       '@prisma/adapter-pg':
@@ -528,7 +528,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../config
       '@types/pg':
@@ -553,7 +553,7 @@ importers:
         specifier: 'catalog:'
         version: 4.4.3
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -602,7 +602,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
-      '@no-chat/config':
+      '@opaque/config':
         specifier: workspace:*
         version: link:../config
       '@tailwindcss/postcss':
